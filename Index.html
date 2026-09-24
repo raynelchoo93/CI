@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>重疾保障缺口计算器</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: #f4f7fb;
+      color: #172033;
+    }
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 30px rgba(20, 35, 60, .08);
+    }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    .subtitle { margin: 0 0 24px; color: #667085; }
+    h2 { font-size: 18px; margin: 0 0 16px; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 7px; }
+    input {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid #d8dee9;
+      border-radius: 12px;
+      font-size: 16px;
+      outline: none;
+    }
+    input:focus { border-color: #667eea; }
+    .result {
+      display: grid;
+      gap: 10px;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 13px 0;
+      border-bottom: 1px solid #edf0f5;
+    }
+    .row:last-child { border-bottom: 0; }
+    .total {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .gap {
+      margin-top: 18px;
+      padding: 20px;
+      border-radius: 16px;
+      background: #fff4f4;
+      border: 1px solid #ffd6d6;
+    }
+    .gap-label { font-size: 14px; font-weight: 700; }
+    .gap-value { font-size: 32px; font-weight: 800; margin-top: 4px; }
+    .positive { color: #c62828; }
+    .covered { background: #f0fff4; border-color: #c8efd3; }
+    .covered .gap-value { color: #16803c; }
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    button {
+      width: 100%;
+      border: 0;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #172033;
+      color: white;
+    }
+    button.secondary {
+      background: #1f9d55;
+    }
+    button.light {
+      background: #eef2f7;
+      color: #172033;
+    }
+    #clientName {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid #d8dee9;
+      border-radius: 12px;
+      font-size: 16px;
+      margin-top: 8px;
+      outline: none;
+    }
+    .client-name-wrap {
+      margin-top: 14px;
+    }
+    @media print {
+      body { background: #fff; }
+      .container { max-width: none; padding: 0; }
+      .card { box-shadow: none; border: 1px solid #e5e7eb; }
+      .no-print, .actions-card, .note { display: none !important; }
+      .card { page-break-inside: avoid; }
+      #clientNameDisplay { display: block !important; }
+    }
+    #clientNameDisplay {
+      display: none;
+      margin: 0 0 14px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .note {
+      color: #667085;
+      font-size: 13px;
+      line-height: 1.6;
+      margin-top: 16px;
+    }
+    @media (max-width: 600px) {
+      .grid { grid-template-columns: 1fr; }
+      .container { padding-top: 16px; }
+      h1 { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="card">
+      <h1>重疾保障缺口计算器</h1>
+      <p class="subtitle">用几个数字，估算如果重疾导致暂时无法工作，家庭可能面对的现金缺口。</p>
+
+      <h2>① 收入与责任</h2>
+      <div class="grid">
+        <div>
+          <label for="income">每月收入（RM）</label>
+          <input id="income" type="number" min="0" step="100" value="8000">
+        </div>
+        <div>
+          <label for="months">预计不能工作（月）</label>
+          <input id="months" type="number" min="1" step="1" value="12">
+        </div>
+        <div>
+          <label for="living">每月家庭生活费（RM）</label>
+          <input id="living" type="number" min="0" step="100" value="5000">
+        </div>
+        <div>
+          <label for="debt">每月贷款/固定责任（RM）</label>
+          <input id="debt" type="number" min="0" step="100" value="2000">
+        </div>
+        <div>
+          <label for="extra">额外治疗/康复费用（RM）</label>
+          <input id="extra" type="number" min="0" step="500" value="20000">
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>② 现有资源</h2>
+      <div class="grid">
+        <div>
+          <label for="savings">现有储蓄/紧急备用金（RM）</label>
+          <input id="savings" type="number" min="0" step="500" value="30000">
+        </div>
+        <div>
+          <label for="ci">现有重疾保障（RM）</label>
+          <input id="ci" type="number" min="0" step="5000" value="50000">
+        </div>
+        <div>
+          <label for="other">其他可用收入/保障（RM）</label>
+          <input id="other" type="number" min="0" step="500" value="0">
+        </div>
+      </div>
+      <p class="note">这是一个教育与讨论工具，不构成保险、医疗或财务建议。实际保障需求应结合个人情况、保单条款及专业建议评估。</p>
+    </section>
+
+    <section class="card">
+      <h2>③ 计算结果</h2>
+      <div class="result">
+        <div class="row"><span>收入损失</span><strong id="incomeLoss">RM 0</strong></div>
+        <div class="row"><span>家庭生活费 + 固定责任</span><strong id="cashflow">RM 0</strong></div>
+        <div class="row"><span>额外治疗/康复费用</span><strong id="extraResult">RM 0</strong></div>
+        <div class="row total"><span>预计总现金需求</span><strong id="need">RM 0</strong></div>
+        <div class="row"><span>现有储蓄 + 重疾保障 + 其他</span><strong id="available">RM 0</strong></div>
+      </div>
+
+      <div id="gapBox" class="gap">
+        <div class="gap-label">🔴 预计重疾保障缺口</div>
+        <div id="gap" class="gap-value">RM 0</div>
+      </div>
+    </section>
+
+    <section class="card no-print actions-card">
+      <h2>④ 输出给客户</h2>
+      <div class="client-name-wrap">
+        <label for="clientName">客户姓名（可选）</label>
+        <input id="clientName" type="text" placeholder="例如：Wendy">
+      </div>
+      <div class="actions" style="margin-top:14px;">
+        <button type="button" onclick="saveAsPDF()">📄 Save as PDF</button>
+        <button type="button" class="secondary" onclick="sendWhatsApp()">💬 Send WhatsApp</button>
+      </div>
+      <div class="actions" style="margin-top:12px;">
+        <button type="button" class="light" onclick="resetCalculator()">↩️ 恢复示例数字</button>
+      </div>
+      <p class="note">PDF 会使用手机/电脑浏览器的打印功能保存为 PDF。WhatsApp 会打开预填好的客户摘要，再由你手动发送。</p>
+    </section>
+
+    <div id="clientNameDisplay"></div>
+  </main>
+
+  <script>
+    const ids = ["income","months","living","debt","extra","savings","ci","other"];
+
+    function money(value) {
+      return "RM " + Math.round(value).toLocaleString("en-MY");
+    }
+
+    function num(id) {
+      return Math.max(0, Number(document.getElementById(id).value) || 0);
+    }
+
+    function calculate() {
+      const incomeLoss = num("income") * num("months");
+      const cashflow = (num("living") + num("debt")) * num("months");
+      const extra = num("extra");
+      const need = incomeLoss + cashflow + extra;
+
+      const available = num("savings") + num("ci") + num("other");
+      const gap = Math.max(0, need - available);
+
+      document.getElementById("incomeLoss").textContent = money(incomeLoss);
+      document.getElementById("cashflow").textContent = money(cashflow);
+      document.getElementById("extraResult").textContent = money(extra);
+      document.getElementById("need").textContent = money(need);
+      document.getElementById("available").textContent = money(available);
+      document.getElementById("gap").textContent = money(gap);
+
+      const box = document.getElementById("gapBox");
+      if (gap === 0) {
+        box.classList.add("covered");
+        box.querySelector(".gap-label").textContent = "🟢 按目前输入，预计现金需求已有覆盖";
+      } else {
+        box.classList.remove("covered");
+        box.querySelector(".gap-label").textContent = "🔴 预计重疾保障缺口";
+      }
+    }
+
+    function getSummaryText() {
+      const name = (document.getElementById("clientName").value || "").trim();
+      const clientLine = name ? `客户：${name}\n` : "";
+      return clientLine +
+        "重疾保障缺口计算结果\n" +
+        "——————————————\n" +
+        `每月收入：${money(num("income"))}\n` +
+        `预计不能工作：${num("months")}个月\n` +
+        `家庭生活费：${money(num("living"))}/月\n` +
+        `每月贷款/固定责任：${money(num("debt"))}/月\n` +
+        `额外治疗/康复费用：${money(num("extra"))}\n\n` +
+        `收入损失：${document.getElementById("incomeLoss").textContent}\n` +
+        `家庭生活费 + 固定责任：${document.getElementById("cashflow").textContent}\n` +
+        `额外治疗/康复费用：${document.getElementById("extraResult").textContent}\n` +
+        `预计总现金需求：${document.getElementById("need").textContent}\n` +
+        `现有储蓄 + 重疾保障 + 其他：${document.getElementById("available").textContent}\n` +
+        `预计重疾保障缺口：${document.getElementById("gap").textContent}\n\n` +
+        "此工具仅供保险需求讨论与教育用途。";
+    }
+
+    function updateClientNameDisplay() {
+      const name = (document.getElementById("clientName").value || "").trim();
+      const el = document.getElementById("clientNameDisplay");
+      el.textContent = name ? `客户：${name}` : "";
+    }
+
+    function saveAsPDF() {
+      updateClientNameDisplay();
+      window.print();
+    }
+
+    function sendWhatsApp() {
+      updateClientNameDisplay();
+      const message = encodeURIComponent(getSummaryText());
+      const url = "https://wa.me/?text=" + message;
+      window.location.href = url;
+    }
+
+    function resetCalculator() {
+      const defaults = {
+        income: 8000, months: 12, living: 5000, debt: 2000,
+        extra: 20000, savings: 30000, ci: 50000, other: 0
+      };
+      ids.forEach(id => document.getElementById(id).value = defaults[id]);
+      calculate();
+    }
+
+    ids.forEach(id => document.getElementById(id).addEventListener("input", calculate));
+    document.getElementById("clientName").addEventListener("input", updateClientNameDisplay);
+    calculate();
+    updateClientNameDisplay();
+  </script>
+</body>
+</html>
