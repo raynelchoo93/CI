@@ -104,7 +104,7 @@
       <div class="grid">
         <div>
           <label for="income">每月收入（RM）</label>
-          <input id="income" type="number" min="0" step="100" value="8000">
+          <input id="income" type="number" min="0" step="100" value="5000">
         </div>
         <div>
           <label for="months">预计不能工作（月）</label>
@@ -112,15 +112,15 @@
         </div>
         <div>
           <label for="living">每月家庭生活费（RM）</label>
-          <input id="living" type="number" min="0" step="100" value="5000">
+          <input id="living" type="number" min="0" step="100" value="0">
         </div>
         <div>
           <label for="debt">每月贷款/固定责任（RM）</label>
-          <input id="debt" type="number" min="0" step="100" value="2000">
+          <input id="debt" type="number" min="0" step="100" value="0">
         </div>
         <div>
           <label for="extra">额外治疗/康复费用（RM）</label>
-          <input id="extra" type="number" min="0" step="500" value="20000">
+          <input id="extra" type="number" min="0" step="500" value="0">
         </div>
       </div>
     </section>
@@ -130,11 +130,11 @@
       <div class="grid">
         <div>
           <label for="savings">现有储蓄/紧急备用金（RM）</label>
-          <input id="savings" type="number" min="0" step="500" value="30000">
+          <input id="savings" type="number" min="0" step="500" value="0">
         </div>
         <div>
           <label for="ci">现有重疾保障（RM）</label>
-          <input id="ci" type="number" min="0" step="5000" value="50000">
+          <input id="ci" type="number" min="0" step="5000" value="0">
         </div>
         <div>
           <label for="other">其他可用收入/保障（RM）</label>
@@ -204,8 +204,8 @@
 
     function resetCalculator() {
       const defaults = {
-        income: 8000, months: 12, living: 5000, debt: 2000,
-        extra: 20000, savings: 30000, ci: 50000, other: 0
+        income: 5000, months: 12, living: 0, debt: 0,
+        extra: 0, savings: 0, ci: 0, other: 0
       };
       ids.forEach(id => document.getElementById(id).value = defaults[id]);
       calculate();
